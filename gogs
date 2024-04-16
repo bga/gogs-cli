@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# [https://github.com/grogorick/gogs-cli]
+set -eu
 
 # config ----------
 
@@ -14,6 +15,8 @@ gogs_server_filename=gogs-server-url.txt
 # utils ----------
 
 shopt -s expand_aliases
+
+debug=
 
 function configure {
 	# server url
@@ -395,6 +398,7 @@ function resolve-or-input-password {
 }
 
 # actions ----------
+actions=
 
 actions=$actions" create-api-token"
 function create-api-token {
@@ -906,6 +910,7 @@ function print-help {
 	echo "  "ACTIONS
 	echo
 	for action in $actions; do
+		info=
 		if [ "$action" = "-" ]; then
 			echo
 		elif [[ "$action" = "("* ]]; then
@@ -949,7 +954,7 @@ help=false
 dry_run=false
 debug=0
 no_checks=false
-while [ -n "$1" ] && [[ "$1" = "-"* ]] && [ "$1" != "--" ]; do
+while [ 0 -lt "$#" ] && [[ "$1" = "-"* ]] && [ "$1" != "--" ]; do
 	case "$1" in
 		-h | --help) help=true ;;
 		-d | --dry-run) dry_run=true; debug=1; echo \# DRY RUN \(doing nothing\) ;;
