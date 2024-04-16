@@ -20,7 +20,7 @@ debug=
 
 function configure {
 	# server url
-	gogs_server=$(printenv $gogs_server_envvar)
+	gogs_server=$(printenv $gogs_server_envvar) || true
 	if [ -z "$gogs_server" ] && [ -f "$gogs_server_filename" ]; then
 		gogs_server=$(cat "$gogs_server_filename")
   fi
@@ -32,7 +32,7 @@ function configure {
 	fi
 
 	# api token
-	gogs_token=$(printenv $gogs_token_envvar)
+	gogs_token=$(printenv $gogs_token_envvar) || true
 	if [ -z "$gogs_token" ] && [ -f "$gogs_token_filename" ]; then
 		gogs_token=$(cat "$gogs_token_filename")
 	fi
