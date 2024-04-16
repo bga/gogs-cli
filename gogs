@@ -72,7 +72,7 @@ function gogs-curl {
 		echo -e "# Address: $address"
 		echo -e "# Data:    $data"
 	fi
-	if ! $dry_run; then
+	if ! [ -n "$dry_run" ]; then
 		echo
 		sleep 1s
 		if [ -n "$data" ]; then
@@ -98,7 +98,7 @@ function gogs-curl-basic {
 		echo -e "# Address: $address"
 		echo -e "# Data:    $data"
 	fi
-	if ! $dry_run; then
+	if ! [ -n "$dry_run" ]; then
 		echo
 		sleep 1s
 		if [ -n "$data" ]; then
@@ -110,13 +110,13 @@ function gogs-curl-basic {
 }
 
 function syntax-help {
-	if [ $1 -gt $(( $# - 2 )) ]; then local missing_args=true; else local missing_args=false; fi
-	if $help || [ "$3" = "--help" ]; then local help_requested=true; else local help_requested=false; fi
-	if $missing_args || $help_requested; then
+	if [ $1 -gt $(( $# - 2 )) ]; then local missing_args=true; else local missing_args=; fi
+	if [ -n "$help" ] || [ "$3" = "--help" ]; then local help_requested=true; else local help_requested=; fi
+	if [ -n "$missing_args" ] || [ -n "$help_requested" ]; then
 		if [ -z "$2" ]; then
 			echo Syntax: \(no arguments\)
 		else
-			if ! $help_requested; then
+			if ! [ -n "$help_requested" ]; then
 				echo-error Missing argument\(s\)
 			fi
 			echo Syntax: $2
@@ -247,7 +247,7 @@ alias sub-cmd-cleanup='
 	'
 
 alias sub-cmd-skip-if-debug='
-	if $dry_run; then
+	if [ -n "$dry_run" ]; then
 		((debug--))
 		return 0
 	fi
@@ -274,7 +274,7 @@ alias return-exit-code-if-error='
 	'
 
 function check-entity {
-	if $no_checks; then
+	if [ -n "$no_checks" ]; then
 		return 0
 	fi
 	local not=$1
@@ -287,17 +287,17 @@ function check-entity {
 	`echo get-$entity` "$@" > /dev/null 2>&1
 	local check_entity_error_code=$?
 	sub-cmd-cleanup
-	if ! $not && [ $check_entity_error_code -eq 0 ]; then
+	if ! [ -n "$not" ] && [ $check_entity_error_code -eq 0 ]; then
 		echo-error $desc already exists
 		return 1
-	elif $not && [ $check_entity_error_code -ne 0 ]; then
+	elif [ -n "$not" ] && [ $check_entity_error_code -ne 0 ]; then
 		echo-error $desc does NOT exist
 		return 1
 	fi
 	return 0
 }
 
-function check-entity-exists { check-entity false "$@"; }
+function check-entity-exists { check-entity "" "$@"; }
 function check-entity-exists-not { check-entity true "$@"; }
 
 function check-org-exists { check-entity-exists org org "Organization \`$1\`" $1; }
@@ -387,7 +387,7 @@ function resolve-user-org-id {
 }
 
 function resolve-or-input-password {
-	if $dry_run; then
+	if [ -n "$dry_run" ]; then
 		password=PASSWORD
 	elif [ -z "$1" ]; then
 		read -sp "Password: " password
@@ -950,10 +950,10 @@ function print-help {
 	fi
 }
 
-help=false
-dry_run=false
+help=
+dry_run=
 debug=0
-no_checks=false
+no_checks=
 while [ 0 -lt "$#" ] && [[ "$1" = "-"* ]] && [ "$1" != "--" ]; do
 	case "$1" in
 		-h | --help) help=true ;;
@@ -963,13 +963,13 @@ while [ 0 -lt "$#" ] && [[ "$1" = "-"* ]] && [ "$1" != "--" ]; do
 	esac
 	shift
 done
-if $no_checks && is-debug; then
+if [ -n "$no_checks" ] && is-debug; then
 	 echo \# SKIP SANITY CHECKS
 fi
 
 function run_action {
 	action=$1
-	$help || configure
+	[ -n "$help" ] || configure
 	if is-debug; then
 		echo -e "# Config:\tURL: $gogs_server"
 		echo -e "#\t\tToken: $gogs_token"
