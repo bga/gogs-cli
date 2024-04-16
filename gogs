@@ -26,7 +26,7 @@ function configure {
   fi
 	if [ -z "$gogs_server" ] && [ $# -eq 0 ]; then
 		echo-warning No Gogs server URL \(e.g. https://try.gogs.io\) configured.
-		read -p "URL: " gogs_server
+		read -rp "URL: " gogs_server
 		echo
 		if [ -z "$gogs_server" ]; then exit 0; fi
 	fi
@@ -41,7 +41,7 @@ function configure {
 	fi
   if [ -z "$gogs_token" ] && [ $# -eq 0 ]; then
 		echo-warning No Gogs API token configured.
-		read -sp "Token: " gogs_token
+		read -rsp "Token: " gogs_token
 		echo
 		if [ -z "$gogs_token" ]; then exit 0; fi
 	fi
@@ -390,7 +390,7 @@ function resolve-or-input-password {
 	if [ -n "$dry_run" ]; then
 		password=PASSWORD
 	elif [ -z "$1" ]; then
-		read -sp "Password: " password
+		read -rsp "Password: " password
 		echo
 	else
 		password="$1"
