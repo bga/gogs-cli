@@ -12,6 +12,10 @@ gogs_server="" # https://try.gogs.io
 gogs_server_envvar=GOGS_SERVER_URL
 gogs_server_filename=gogs-server-url.txt
 
+curlExtraOptions="" # --insecure for example
+curlExtraOptions_envvar=GOGS_CURL_EXTRA_OPTIONS
+
+
 # utils ----------
 
 shopt -s expand_aliases
@@ -45,6 +49,8 @@ function configure {
 		echo
 		if [ -z "$gogs_token" ]; then exit 0; fi
 	fi
+
+	curlExtraOptions=$(printenv $curlExtraOptions_envvar || echo)
 }
 
 function run_curl_and_log {
@@ -76,9 +82,9 @@ function gogs-curl {
 		echo
 		sleep 1s
 		if [ -n "$data" ]; then
-			run_curl_and_log curl -d "$data" -H "Content-Type: application/json" -X "$method" "$address" --insecure
+			run_curl_and_log curl -d "$data" -H "Content-Type: application/json" -X "$method" "$address" $curlExtraOptions
 		else
-			run_curl_and_log curl -X "$method" "$address" --insecure
+			run_curl_and_log curl -X "$method" "$address" $curlExtraOptions
 		fi
 	fi
 }
@@ -102,9 +108,9 @@ function gogs-curl-basic {
 		echo
 		sleep 1s
 		if [ -n "$data" ]; then
-			run_curl_and_log curl -u "$auth" -d "$data" -H "Content-Type: application/json" -X "$method" "$address" --insecure
+			run_curl_and_log curl -u "$auth" -d "$data" -H "Content-Type: application/json" -X "$method" "$address" $curlExtraOptions
 		else
-			run_curl_and_log curl -u "$auth" -X "$method" "$address" --insecure
+			run_curl_and_log curl -u "$auth" -X "$method" "$address" $curlExtraOptions
 		fi
 	fi
 }
